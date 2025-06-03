@@ -95,5 +95,4 @@ public class ImageProcessingConsumer {
         }
         return true;
     }
-
 }
