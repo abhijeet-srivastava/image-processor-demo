@@ -60,6 +60,35 @@ Verify containers are running:
 Check producer logs:
     docker logs image-producer
 
+Creating Topics for processing , retry and dead-letter-queue-
+
+
+docker exec -it image-processor-demo-kafka-1 kafka-topics --create \
+--bootstrap-server kafka:9092 \
+--replication-factor 1 \
+--partitions 1 \
+--topic input-topic \
+--config retention.ms=604800000 --config min.cleanable.dirty.ratio=0.9 --config segment.bytes=1048576
+
+docker exec -it image-processor-demo-kafka-1 kafka-topics --create \
+--bootstrap-server kafka:9092 \
+--replication-factor 1 \
+--partitions 1 \
+--topic retry-input-topic \
+--config retention.ms=604800000 --config min.cleanable.dirty.ratio=0.9 --config segment.bytes=1048576
+
+docker exec -it image-processor-demo-kafka-1 kafka-topics --create \
+--bootstrap-server kafka:9092 \
+--replication-factor 1 \
+--partitions 1 \
+--topic dlq-input-topic \
+--config segment.bytes=1048576
+
+Add/Alter config-
+
+docker exec -it image-processor-demo-kafka-1 kafka-configs --bootstrap-server kafka:9092 \
+--entity-type topics --entity-name input-topic --alter \
+--add-config max.message.bytes=1048576
 
 Run consumer application:
     cd image-processing-consumer
