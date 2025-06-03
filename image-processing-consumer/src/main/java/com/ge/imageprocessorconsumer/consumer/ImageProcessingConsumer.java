@@ -7,6 +7,7 @@ import com.ge.imageprocessorconsumer.processor.ImageProcessingPipeline;
 import com.ge.imageprocessorconsumer.processor.ImageProcessor;
 import com.ge.model.ImageProcessingMessage;
 import com.ge.model.ProcessStatus;
+import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,5 +95,19 @@ public class ImageProcessingConsumer {
                     ipe.getErrorCode() == ErrorCode.IO_ERROR;
         }
         return true;
+    }
+
+    @PreDestroy
+    public void shutdown() {
+        LOGGER.info("Shutting down scheduler");
+        scheduler.shutdown();
+        try {
+            if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                scheduler.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            scheduler.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 }
