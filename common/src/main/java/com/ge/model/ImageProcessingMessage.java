@@ -93,4 +93,8 @@ public class ImageProcessingMessage implements Serializable {
     public void setMetadata(Map<String, Object> metadata) {
         this.metadata = metadata;
     }
+
+    public void incrementRetryCount() {
+        this.setRetryCount(this.retryCount + 1);
+    }
 }

@@ -14,11 +14,15 @@ public class ImageProcessingPipeline {
 
 
     @Autowired
-    public ImageProcessingPipeline(ResizeProcessor resizeProcessor,
-                                   GrayscaleProcessor grayscaleProcessor) {
+    public ImageProcessingPipeline(
+            ValidationProcessor validationProcessor,
+            ResizeProcessor resizeProcessor,
+            GrayscaleProcessor grayscaleProcessor) {
         this.processorChain = new EnumMap<>(ProcessStatus.class);
-        processorChain.put(ProcessStatus.START, resizeProcessor);
+        processorChain.put(ProcessStatus.START, validationProcessor);
+        processorChain.put(ProcessStatus.VALIDATED, resizeProcessor);
         processorChain.put(ProcessStatus.RESIZED, grayscaleProcessor);
+        validationProcessor.setNext(resizeProcessor);
         resizeProcessor.setNext(grayscaleProcessor);
     }
 
