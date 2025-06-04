@@ -38,7 +38,7 @@ public class ValidationProcessor extends AbstractImageProcessor {
         try {
             BufferedImage inputImage
                     = fileStorage.readImage(inputFilePath, fileStorage.fileName(input.getImageId(), input.getImageFormat()));
-            if (inputImage.getWidth() > 2000 || inputImage.getHeight() > 2000
+            if (inputImage.getWidth() > 2500 || inputImage.getHeight() > 2500
                     || inputImage.getWidth() < 10 || inputImage.getHeight() < 10) {
                 LOGGER.error("Invalid image dimensions: Height {}, Width : {}", inputImage.getHeight(), inputImage.getWidth());
                 throw new ImageProcessingException(ErrorCode.PROCESSING_FAILURE, "Image dimensions are too large or too small for resizing. Width should be 10 - 5000 and Height should be 10 - 5000");

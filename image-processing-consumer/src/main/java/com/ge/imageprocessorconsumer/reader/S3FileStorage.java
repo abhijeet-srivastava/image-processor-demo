@@ -18,6 +18,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Component
@@ -82,6 +83,11 @@ public class S3FileStorage implements FileStorage {
             LOGGER.error("Unexpected error writing image: path={}, error={}", outputFilePath, e.getMessage(), e);
             throw new IOException("An unexpected error occurred: " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public void write(Path path, byte[] data) throws IOException {
+        //TODO: Add S3 writing implementations
     }
 
     private static String getImageMimeType(String fileFormat) {

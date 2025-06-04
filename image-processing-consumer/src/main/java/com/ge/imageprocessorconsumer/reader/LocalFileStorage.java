@@ -12,6 +12,8 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Component
@@ -58,6 +60,12 @@ public class LocalFileStorage implements FileStorage {
             LOGGER.error("Error writing image: path={}, error={}", outputFilePath, e.getMessage());
             throw e;
         }
+    }
+
+    @Override
+    public void write(Path path, byte[] data) throws IOException {
+        Files.createDirectories(path.getParent());
+        Files.write(path, data);
     }
 
 }

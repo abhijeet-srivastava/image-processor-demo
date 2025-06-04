@@ -47,28 +47,59 @@ public class ImageController {
     public ResponseEntity<String> submitImage(@RequestBody ImageProcessRequest msg) {
         LOGGER.info("Received message: {} and FileFormat: {}", msg.getFileName(), msg.getFileFormat());
         String imageId = UUID.randomUUID().toString();
-        String newFileName = imageId + "." + msg.getFileFormat();
+        /*String newFileName = imageId + "." + msg.getFileFormat();
 
         try {
             copyImage("/input", msg.getFileName(), "/raw", newFileName);
         } catch (IOException e) {
             return ResponseEntity.internalServerError().body("Invalid Input file");
-        }
+        }*/
         ImageProcessingMessage inputMsg = new ImageProcessingMessage();
         inputMsg.setImageId(imageId);
         inputMsg.setS3Path(basePath);
+        try {
+            inputMsg.setImageData(readInputFile("/input", msg.getFileName()));
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().body("Invalid Input file");
+        }
         inputMsg.setImageFormat(msg.getFileFormat());
         inputMsg.setStatus(ProcessStatus.START);
         inputMsg.setRetryCount(0);
         String timestamp = currentTimeStamp();
         inputMsg.setDeliveryTimestamp(timestamp);
-        kafkaTemplate.send(topic, inputMsg.getImageId(), inputMsg);
+        //kafkaTemplate.send(topic, inputMsg.getImageId(), inputMsg);
+        kafkaTemplate.send(topic, inputMsg.getImageId(), inputMsg)
+                .whenComplete((result, ex) -> {
+                    if (ex != null) {
+                        LOGGER.error("Failed to send message: {}", ex.getMessage());
+                    } else {
+                        LOGGER.info("Message sent to topic {}: {}", topic, inputMsg.getImageId());
+                    }
+                });
         return ResponseEntity.ok("{\"message\":\"Message Sent\"}");
     }
+
+
 
     private String currentTimeStamp() {
         ZonedDateTime nowUtcZoned = ZonedDateTime.now(ZoneOffset.UTC);
         return nowUtcZoned.format(formatter);
+    }
+
+    private byte[] readInputFile(String sourceFolderPath, String sourceFileName) throws IOException {
+        Path sourcePath = Paths.get(sourceFolderPath, sourceFileName);
+
+        // Read image bytes
+        if (!Files.exists(sourcePath)) {
+            LOGGER.error("Source file does not exist: {}", sourcePath.toAbsolutePath());
+            throw new IllegalArgumentException(
+                    "Source file does not exist: " + sourcePath.toAbsolutePath()
+            );
+        }
+
+        byte[] imageData = Files.readAllBytes(sourcePath);
+        LOGGER.info("Read image file: {}, size: {} bytes", sourcePath, imageData.length);
+        return imageData;
     }
 
     /**

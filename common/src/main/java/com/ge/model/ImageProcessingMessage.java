@@ -30,6 +30,8 @@ public class ImageProcessingMessage implements Serializable {
     @JsonProperty("metadata")
     private Map<String, Object> metadata;
 
+    private byte[] imageData; // Image bytes
+
     public String getImageId() {
         return imageId;
     }
@@ -92,6 +94,14 @@ public class ImageProcessingMessage implements Serializable {
 
     public void setMetadata(Map<String, Object> metadata) {
         this.metadata = metadata;
+    }
+
+    public byte[] getImageData() {
+        return imageData;
+    }
+
+    public void setImageData(byte[] imageData) {
+        this.imageData = imageData;
     }
 
     public void incrementRetryCount() {

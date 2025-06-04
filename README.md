@@ -139,6 +139,21 @@ Troubleshooting Issues:
      - Reset offset if required-
        docker exec -it image-processor-demo-kafka-1 kafka-consumer-groups --bootstrap-server kafka:9092 \
        --group message-processor-group --reset-offsets --to-latest --execute --topic input-topic
+4. Other Miscelleneous issues-
+   a. Producer fails to copy file
+        - Verify file exists and appropriate permissions
+        - Observe producer logs for any errors
+   b. Latest changes for producer or common package not reflecting
+        - Ensure common module changes are installed in repo - mvn clean install
+        - For producer changes, ensure to package module before building docker image
+
+Alerts:
+    Configure alerts for cases which may require manual interventions-
+    1. Alerts for Kafka topic offset lag surpassing threshold value
+    2. Alerts for any message entering in DLQ topic
+    3. Alerts for any particular exception exceeding threshold in particular window.
+
+
 
 
 
